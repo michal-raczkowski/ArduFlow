@@ -25,7 +25,6 @@ export function listBoards(): Promise<string> {
         }
 
         resolve(stdout.trim())
-        console.log(stdout)
       }
     )
   })

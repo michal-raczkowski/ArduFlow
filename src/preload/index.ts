@@ -5,8 +5,29 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {}
 
 const arduinoAPI = {
-  sendDataToMainProcess: () => {
-    ipcRenderer.send('data-to-main')
+  requestListBoards: (requestData) => {
+    return new Promise<string>((resolve, reject) => {
+      ipcRenderer.once('listboard-response', (event, responseData) => {
+        resolve(responseData)
+      })
+
+      ipcRenderer.send('listboard-request', requestData)
+    })
+  },
+  uploadCode: (nameOfFile) => {
+    ipcRenderer.send('uploadCode', nameOfFile)
+  }
+}
+
+const jsonsFilesAPI = {
+  getFileJsonList: async () => {
+    try {
+      const fileList: Promise<string[]> = await ipcRenderer.invoke('getListOfJsons')
+      return fileList
+    } catch (error) {
+      console.error('Error retrieving file list:', error)
+      return []
+    }
   }
 }
 
@@ -18,6 +39,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('arduinoCliAPI', arduinoAPI)
+    contextBridge.exposeInMainWorld('jsonsFilesAPI', jsonsFilesAPI)
   } catch (error) {
     console.error(error)
   }

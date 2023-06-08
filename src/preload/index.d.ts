@@ -5,7 +5,11 @@ declare global {
     electron: ElectronAPI
     api: unknown
     arduinoCliAPI: {
-      sendDataToMainProcess: () => void
+      requestListBoards: (requestData: string) => Promise<string>
+      uploadCode: (nameOfFile: string) => void
+    }
+    jsonsFilesAPI: {
+      getFileJsonList: () => Promise<string[]>
     }
   }
 }

@@ -2,6 +2,12 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { listBoards, uploadSketch } from '../arduino-cli-wrapper/arduinoCliWrapper'
+import { listFilesInFolder } from '../main/jsonMenager'
+import {
+  modifyArduinoCodeWithImages,
+  ArduinoCodeModificationParams
+} from '../arduino-cli-wrapper/modifySketch'
+import path from 'path'
 
 function createWindow(): void {
   // Create the browser window.
@@ -70,6 +76,32 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('data-to-main', () => {
-  listBoards()
+ipcMain.on('listboard-request', (event, requestData) => {
+  // Process the request and prepare the response
+  return listBoards().then((list) => {
+    event.sender.send('listboard-response', list)
+  })
+  // Send the response back to the renderer process
+})
+
+ipcMain.on('uploadCode', (event, nameOfFile) => {
+  const sketchPath = path.resolve(process.cwd(), 'src/arduino-cli-wrapper/sketch/sketch.ino')
+
+  const param: ArduinoCodeModificationParams = {
+    originalFilePath: sketchPath,
+    jsonFilePath: path.resolve(process.cwd(), 'src/jsons/' + nameOfFile)
+  }
+  modifyArduinoCodeWithImages(param)
+    .then(() => uploadSketch(sketchPath, 'arduino:avr:micro', '/dev/ttyACM0'))
+    .catch((err) => console.log(err))
+})
+
+ipcMain.handle('getListOfJsons', async (event) => {
+  return listFilesInFolder()
+    .then((fileList) => {
+      return fileList
+    })
+    .catch((error) => {
+      throw new Error(`Failed to list files: ${error.message}`)
+    })
 })
