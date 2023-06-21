@@ -45,7 +45,7 @@ export function uploadSketch(sketchPath: string, board: string, port: string): P
         port,
         sketchPath
       ],
-      (error, stdout, stderr) => {
+      (error, _stdout, stderr) => {
         if (error) {
           console.error(`Error executing Arduino-CLI command: ${error}`)
           reject(error)
@@ -117,11 +117,11 @@ export function isCoreExist(): boolean {
 }
 
 export function installArduinoCore(): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((_resolve, reject) => {
     execFile(
       arduinoCliBinPath,
       ['--config-file', arduinoCliConfigPath, 'core', 'install', 'arduino:avr'],
-      (error, stdout, stderr) => {
+      (error, _stdout, stderr) => {
         if (error) {
           console.error(`Error executing Arduino-CLI command: ${error}`)
           reject(error)

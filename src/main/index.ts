@@ -76,7 +76,7 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('listboard-request', (event, requestData) => {
+ipcMain.on('listboard-request', (event) => {
   // Process the request and prepare the response
   return listBoards().then((list) => {
     event.sender.send('listboard-response', list)
@@ -84,7 +84,7 @@ ipcMain.on('listboard-request', (event, requestData) => {
   // Send the response back to the renderer process
 })
 
-ipcMain.on('uploadCode', (event, nameOfFile) => {
+ipcMain.on('uploadCode', (_event, nameOfFile) => {
   const sketchPath = path.resolve(process.cwd(), 'src/arduino-cli-wrapper/sketch/sketch.ino')
 
   const param: ArduinoCodeModificationParams = {
@@ -96,7 +96,7 @@ ipcMain.on('uploadCode', (event, nameOfFile) => {
     .catch((err) => console.log(err))
 })
 
-ipcMain.handle('getListOfJsons', async (event) => {
+ipcMain.handle('getListOfJsons', async (_event) => {
   return listFilesInFolder()
     .then((fileList) => {
       return fileList

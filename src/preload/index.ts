@@ -6,8 +6,8 @@ const api = {}
 
 const arduinoAPI = {
   requestListBoards: (requestData) => {
-    return new Promise<string>((resolve, reject) => {
-      ipcRenderer.once('listboard-response', (event, responseData) => {
+    return new Promise<string>((resolve, _reject) => {
+      ipcRenderer.once('listboard-response', (_event, responseData) => {
         resolve(responseData)
       })
 

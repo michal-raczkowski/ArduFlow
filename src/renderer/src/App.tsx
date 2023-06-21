@@ -2,9 +2,22 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import Button from '@mui/material/Button'
 import SelectableList from './components/SelectableList'
+import logo from './assets/ArduFlowLogo.png'
+import { ILed } from './interfaces'
+import CodeGeneratorUI from './components/CodeGeneratorUI'
+import CodeGenerator from './components/CodeGenerator'
+import FrameController from './components/FrameController'
+import Frame from './components/Frame'
+import FramePreview from './components/FramePreview'
 
 const arduinoAPI = window.arduinoCliAPI
 const jsonsAPI = window.jsonsFilesAPI
+
+const initialFrame: ILed[][] = Array.from({ length: 8 }, (_, x) =>
+  Array.from({ length: 8 }, (_, y) => ({ isOn: false, x, y }))
+)
+
+const initialState: ILed[][][] = [initialFrame]
 
 function App() {
   const [jsonList, setJsonList] = useState<string[]>([])
@@ -20,8 +33,6 @@ function App() {
       })
   }, [])
 
-  const [list, setList] = useState('list')
-
   const handleClick = () => {
     // Event handler logic
     console.log('Button clicked!')
@@ -32,10 +43,64 @@ function App() {
     console.log(selectedItem)
   }, [selectedItem])
 
+  const [state, setState] = useState<ILed[][][]>(initialState)
+  const [currentFrame, setCurrentFrame] = useState<number>(0)
+
+  const toggleLed = (x: number, y: number) => {
+    setState((prevState) => {
+      const newFrame = prevState[currentFrame].map((row) =>
+        row.map((led) => (led.x === x && led.y === y ? { ...led, isOn: !led.isOn } : led))
+      )
+
+      return [...prevState.slice(0, currentFrame), newFrame, ...prevState.slice(currentFrame + 1)]
+    })
+  }
+
+  const addFrame = () => {
+    const newFrame: ILed[][] = Array.from({ length: 8 }, (_, x) =>
+      Array.from({ length: 8 }, (_, y) => ({ isOn: false, x, y }))
+    )
+
+    setState((prevState) => [...prevState, newFrame])
+    setCurrentFrame((prevState) => prevState + 1)
+  }
+  const deleteFrame = (index: number) => {
+    if (state.length === 1) return
+
+    setState((prevState) => {
+      return [...prevState.slice(0, index), ...prevState.slice(index + 1)]
+    })
+
+    setCurrentFrame((prevState) => Math.max(prevState - 1, 0))
+  }
+
+  const switchFrame = (index: number) => {
+    setCurrentFrame(index)
+  }
+
   return (
     <>
       <div>
-        <div className="exampleChart"></div>
+        <FrameController
+          currentFrame={currentFrame}
+          frameCount={state.length}
+          addFrame={addFrame}
+          deleteFrame={deleteFrame}
+          switchFrame={switchFrame}
+        />
+        {state.map((leds, index) => (
+          <FramePreview
+            key={index}
+            leds={leds}
+            onSwitchFrame={() => switchFrame(index)}
+            onDeleteFrame={() => deleteFrame(index)}
+            ledSize="20px"
+            gap="2px"
+          />
+        ))}
+        <Frame leds={state[currentFrame]} toggleLed={toggleLed} ledSize="50px" gap="10px" />
+        <CodeGeneratorUI state={state} width="300px" height="200px" />
+        <img style={{ width: '20%', height: '20%' }} src={logo} alt="ArduFlow Logo" />{' '}
         <SelectableList items={jsonList} onSelect={setSelectedItem} />
       </div>
       <div className="card">
