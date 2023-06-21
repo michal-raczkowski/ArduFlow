@@ -1,13 +1,7 @@
 import { ILed } from '../interfaces'
 
-interface Props {
-  state: ILed[][][]
-  width: string
-  height: string
-}
-
-function CodeGenerator(props: Props) {
-  const frames = props.state.map((frame) =>
+function CodeGenerator(state: ILed[][][]) {
+  const frames = state.map((frame) =>
     frame.map((row) => row.map((led) => (led.isOn ? '1' : '0')).join(''))
   )
 

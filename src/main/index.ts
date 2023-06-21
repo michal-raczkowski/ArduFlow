@@ -4,8 +4,10 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { listBoards, uploadSketch } from '../arduino-cli-wrapper/arduinoCliWrapper'
 import { listFilesInFolder } from '../main/jsonMenager'
 import {
-  modifyArduinoCodeWithImages,
-  ArduinoCodeModificationParams
+  modifyArduinoCodeWithImagesFromFile,
+  ArduinoCodeModificationParamsFile,
+  ArduinoCodeModificationParamsRawJson,
+  modifyArduinoCodeWithImagesFromRawCode
 } from '../arduino-cli-wrapper/modifySketch'
 import path from 'path'
 
@@ -84,14 +86,26 @@ ipcMain.on('listboard-request', (event) => {
   // Send the response back to the renderer process
 })
 
-ipcMain.on('uploadCode', (_event, nameOfFile) => {
+ipcMain.on('uploadCodeFromFile', (_event, nameOfFile) => {
   const sketchPath = path.resolve(process.cwd(), 'src/arduino-cli-wrapper/sketch/sketch.ino')
 
-  const param: ArduinoCodeModificationParams = {
+  const param: ArduinoCodeModificationParamsFile = {
     originalFilePath: sketchPath,
     jsonFilePath: path.resolve(process.cwd(), 'src/jsons/' + nameOfFile)
   }
-  modifyArduinoCodeWithImages(param)
+  modifyArduinoCodeWithImagesFromFile(param)
+    .then(() => uploadSketch(sketchPath, 'arduino:avr:micro', '/dev/ttyACM0'))
+    .catch((err) => console.log(err))
+})
+
+ipcMain.on('uploadCodeFromJson', (_event, jsonString) => {
+  const sketchPath = path.resolve(process.cwd(), 'src/arduino-cli-wrapper/sketch/sketch.ino')
+
+  const param: ArduinoCodeModificationParamsRawJson = {
+    originalFilePath: sketchPath,
+    json: jsonString
+  }
+  modifyArduinoCodeWithImagesFromRawCode(param)
     .then(() => uploadSketch(sketchPath, 'arduino:avr:micro', '/dev/ttyACM0'))
     .catch((err) => console.log(err))
 })

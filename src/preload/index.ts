@@ -14,8 +14,11 @@ const arduinoAPI = {
       ipcRenderer.send('listboard-request', requestData)
     })
   },
-  uploadCode: (nameOfFile) => {
-    ipcRenderer.send('uploadCode', nameOfFile)
+  uploadCodeFromFile: (nameOfFile) => {
+    ipcRenderer.send('uploadCodeFromFile', nameOfFile)
+  },
+  uploadCodeFromJson: (jsonString) => {
+    ipcRenderer.send('uploadCodeFromJson', jsonString)
   }
 }
 

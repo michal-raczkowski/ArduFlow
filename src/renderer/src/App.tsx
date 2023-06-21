@@ -36,7 +36,7 @@ function App() {
   const handleClick = () => {
     // Event handler logic
     console.log('Button clicked!')
-    arduinoAPI.uploadCode(selectedItem)
+    arduinoAPI.uploadCodeFromJson(CodeGenerator(state))
   }
 
   useEffect(() => {

@@ -6,7 +6,8 @@ declare global {
     api: unknown
     arduinoCliAPI: {
       requestListBoards: (requestData: string) => Promise<string>
-      uploadCode: (nameOfFile: string) => void
+      uploadCodeFromFile: (nameOfFile: string) => void
+      uploadCodeFromJson: (jsonString: string) => void
     }
     jsonsFilesAPI: {
       getFileJsonList: () => Promise<string[]>
