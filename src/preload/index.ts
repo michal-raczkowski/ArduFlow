@@ -5,20 +5,29 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {}
 
 const arduinoAPI = {
-  requestListBoards: (requestData) => {
+  requestListBoards: () => {
     return new Promise<string>((resolve, _reject) => {
       ipcRenderer.once('listboard-response', (_event, responseData) => {
         resolve(responseData)
       })
 
-      ipcRenderer.send('listboard-request', requestData)
+      ipcRenderer.send('listboard-request')
     })
   },
-  uploadCodeFromFile: (nameOfFile) => {
+  uploadCodeFromFile: (nameOfFile: string) => {
     ipcRenderer.send('uploadCodeFromFile', nameOfFile)
   },
-  uploadCodeFromJson: (jsonString) => {
-    ipcRenderer.send('uploadCodeFromJson', jsonString)
+  uploadCodeFromJson: (jsonString: string, port: string) => {
+    ipcRenderer.send('uploadCodeFromJson', jsonString, port)
+  },
+  getAvailablePorts: () => {
+    return new Promise<string[]>((resolve, _reject) => {
+      ipcRenderer.once('ports-response', (_event, responseData) => {
+        resolve(responseData)
+      })
+
+      ipcRenderer.send('ports-request')
+    })
   }
 }
 

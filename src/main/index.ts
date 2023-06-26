@@ -1,7 +1,11 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { listBoards, uploadSketch } from '../arduino-cli-wrapper/arduinoCliWrapper'
+import {
+  getAvailablePorts,
+  listBoards,
+  uploadSketch
+} from '../arduino-cli-wrapper/arduinoCliWrapper'
 import { listFilesInFolder } from '../main/jsonMenager'
 import {
   modifyArduinoCodeWithImagesFromFile,
@@ -86,27 +90,35 @@ ipcMain.on('listboard-request', (event) => {
   // Send the response back to the renderer process
 })
 
-ipcMain.on('uploadCodeFromFile', (_event, nameOfFile) => {
+ipcMain.on('ports-request', (event) => {
+  // Process the request and prepare the response
+  return getAvailablePorts().then((list) => {
+    event.sender.send('ports-response', list)
+  })
+  // Send the response back to the renderer process
+})
+
+ipcMain.on('uploadCodeFromFile', (_event, nameOfFile: string) => {
   const sketchPath = path.resolve(process.cwd(), 'src/arduino-cli-wrapper/sketch/sketch.ino')
 
-  const param: ArduinoCodeModificationParamsFile = {
+  const paramFile: ArduinoCodeModificationParamsFile = {
     originalFilePath: sketchPath,
     jsonFilePath: path.resolve(process.cwd(), 'src/jsons/' + nameOfFile)
   }
-  modifyArduinoCodeWithImagesFromFile(param)
+  modifyArduinoCodeWithImagesFromFile(paramFile)
     .then(() => uploadSketch(sketchPath, 'arduino:avr:micro', '/dev/ttyACM0'))
     .catch((err) => console.log(err))
 })
 
-ipcMain.on('uploadCodeFromJson', (_event, jsonString) => {
+ipcMain.on('uploadCodeFromJson', (_event, jsonString: string, port: string) => {
   const sketchPath = path.resolve(process.cwd(), 'src/arduino-cli-wrapper/sketch/sketch.ino')
 
-  const param: ArduinoCodeModificationParamsRawJson = {
+  const paramJson: ArduinoCodeModificationParamsRawJson = {
     originalFilePath: sketchPath,
     json: jsonString
   }
-  modifyArduinoCodeWithImagesFromRawCode(param)
-    .then(() => uploadSketch(sketchPath, 'arduino:avr:micro', '/dev/ttyACM0'))
+  modifyArduinoCodeWithImagesFromRawCode(paramJson)
+    .then(() => uploadSketch(sketchPath, 'arduino:avr:micro', port))
     .catch((err) => console.log(err))
 })
 

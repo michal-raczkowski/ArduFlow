@@ -137,3 +137,41 @@ export function installArduinoCore(): Promise<void> {
     )
   })
 }
+
+export function getAvailablePorts(): Promise<string[]> {
+  return new Promise<string[]>((resolve, reject) => {
+    execFile(
+      arduinoCliBinPath,
+      ['--config-file', arduinoCliConfigPath, 'board', 'list'],
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error executing Arduino-CLI command: ${error}`)
+          reject(error)
+          return
+        }
+        // Check the output for any error messages
+        if (stderr) {
+          console.error(`Arduino-CLI error: ${stderr}`)
+          reject(stderr)
+          return
+        }
+        const lines = stdout.split('\n').filter((n) => n)
+        const ports = lines.slice(1).map((line) => line.split(' ')[0])
+        const names = lines.slice(1).map((line) => line.split(' ')[7] + ' ' + line.split(' ')[8])
+
+        if (names.length !== ports.length) {
+          console.error(`Length of ports and names of connected arduino's do not match`)
+          reject('Index outside of range')
+          return
+        }
+
+        const result: string[] = new Array(ports.length)
+        const length = ports.length
+        for (let i = 0; i < length; i++) {
+          result[i] = ports[i] + ' ' + names[i]
+        }
+        resolve(result)
+      }
+    )
+  })
+}

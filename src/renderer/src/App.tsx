@@ -9,6 +9,7 @@ import CodeGenerator from './components/CodeGenerator'
 import FrameController from './components/FrameController'
 import Frame from './components/Frame'
 import FramePreview from './components/FramePreview'
+import { ArduinoPortsDropdown } from './components/ArduinoPortsDropdown'
 
 const arduinoAPI = window.arduinoCliAPI
 const jsonsAPI = window.jsonsFilesAPI
@@ -22,6 +23,9 @@ const initialState: ILed[][][] = [initialFrame]
 function App() {
   const [jsonList, setJsonList] = useState<string[]>([])
   const [selectedItem, setSelectedItem] = useState('')
+  const [ports, setPorts] = useState<string[]>([])
+  const [selectedPort, setSelectedPort] = useState<string>(' ')
+
   useEffect(() => {
     jsonsAPI
       .getFileJsonList()
@@ -31,13 +35,31 @@ function App() {
       .catch((error) => {
         console.error('Error retrieving file list:', error)
       })
+
+    arduinoAPI
+      .getAvailablePorts()
+      .then((portsList) => {
+        portsList.unshift(' ')
+        console.log(portsList)
+        setPorts(portsList)
+      })
+      .catch((error) => {
+        console.error('Error retrieving port list:', error)
+      })
   }, [])
 
   const handleClick = () => {
-    // Event handler logic
-    console.log('Button clicked!')
-    arduinoAPI.uploadCodeFromJson(CodeGenerator(state))
+    const port = '/' + selectedPort.slice(1).split(' ')[0]
+    console.log(port)
+    arduinoAPI.uploadCodeFromJson(CodeGenerator(state), port)
   }
+
+  const handlePortChange = (port: string) => {
+    setSelectedPort(port)
+  }
+  useEffect(() => {
+    console.log(ports)
+  }, [ports])
 
   useEffect(() => {
     console.log(selectedItem)
@@ -107,6 +129,15 @@ function App() {
         <Button variant="contained" color="primary" onClick={handleClick}>
           Click me
         </Button>
+        <div>
+          <label>Available ports:</label>
+
+          <ArduinoPortsDropdown
+            ports={ports}
+            selectedPort={selectedPort}
+            onPortChange={handlePortChange}
+          />
+        </div>
         <p>
           Test of <code>ArduFlow</code> library
         </p>
