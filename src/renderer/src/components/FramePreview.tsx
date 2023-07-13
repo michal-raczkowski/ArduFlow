@@ -5,48 +5,47 @@ import styled from 'styled-components'
 interface Props {
   leds: ILed[][]
   onSwitchFrame: () => void
-  onDeleteFrame: () => void
   ledSize: string
   gap: string
 }
 
-const Led = styled.div<{ isOn: boolean }>`
-  width: 10px;
-  height: 10px;
-  background-color: ${({ isOn }) => (isOn ? 'red' : 'grey')};
-  margin: 1px;
+const Led = styled.div<{ isOn: boolean; ledSize: string }>`
+  width: ${({ ledSize }) => ledSize};
+  height: ${({ ledSize }) => ledSize};
+  background-color: ${({ isOn }) => (isOn ? '#E94C4C' : '#505553')};
+  border-radius: 50%;
 `
 
-const FramePreview: React.FC<Props> = ({ leds, onSwitchFrame, onDeleteFrame, ledSize, gap }) => {
+const FrameButton = styled.button`
+  margin: 10px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+`
+
+const FramePreview: React.FC<Props> = ({ leds, onSwitchFrame, ledSize, gap }) => {
   return (
     <div style={{ margin: '10px' }}>
-      <button
+      <FrameButton
         onClick={(e) => {
           e.stopPropagation()
           onSwitchFrame()
         }}
       >
-        Switch to this frame
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation()
-          onDeleteFrame()
-        }}
-      >
-        Delete this frame
-      </button>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(8, 1fr)',
-          gap: '2px',
-          width: `calc(8 * (${ledSize} + ${gap} * 2))`,
-          margin: '10px'
-        }}
-      >
-        {leds.map((row, x) => row.map((led, y) => <Led key={`${x}-${y}`} isOn={led.isOn} />))}
-      </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(8, 1fr)',
+            gap: `${gap}`,
+            padding: '0px',
+            margin: '0px'
+          }}
+        >
+          {leds.map((row, x) =>
+            row.map((led, y) => <Led key={`${x}-${y}`} isOn={led.isOn} ledSize={ledSize} />)
+          )}
+        </div>
+      </FrameButton>
     </div>
   )
 }

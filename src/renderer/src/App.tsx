@@ -79,9 +79,7 @@ function App() {
   }
 
   const addFrame = () => {
-    const newFrame: ILed[][] = Array.from({ length: 8 }, (_, x) =>
-      Array.from({ length: 8 }, (_, y) => ({ isOn: false, x, y }))
-    )
+    const newFrame: ILed[][] = state[currentFrame]
 
     setState((prevState) => [...prevState, newFrame])
     setCurrentFrame((prevState) => prevState + 1)
@@ -108,33 +106,29 @@ function App() {
           frameCount={state.length}
           addFrame={addFrame}
           deleteFrame={deleteFrame}
-          switchFrame={switchFrame}
         />
         {state.map((leds, index) => (
           <FramePreview
             key={index}
             leds={leds}
             onSwitchFrame={() => switchFrame(index)}
-            onDeleteFrame={() => deleteFrame(index)}
-            ledSize="20px"
-            gap="2px"
+            ledSize="15px"
+            gap="5px"
           />
         ))}
         <Frame leds={state[currentFrame]} toggleLed={toggleLed} ledSize="50px" gap="20px" />
       </div>
-      <div className="card">
-        <Button variant="contained" color="primary" onClick={handleClick}>
-          Click me
-        </Button>
-        <div>
-          <label>Available ports:</label>
 
-          <ArduinoPortsDropdown
-            ports={ports}
-            selectedPort={selectedPort}
-            onPortChange={handlePortChange}
-          />
-        </div>
+      <Button variant="contained" color="primary" onClick={handleClick}>
+        Click me
+      </Button>
+      <div>
+        <label>I ❤️ Available 🖤 ports:</label>
+        <ArduinoPortsDropdown
+          ports={ports}
+          selectedPort={selectedPort}
+          onPortChange={handlePortChange}
+        />
       </div>
     </>
   )
