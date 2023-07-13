@@ -11,7 +11,8 @@ const StyledButton = styled.button<ILed>`
   border-radius: 50%;
   width: 100%;
   height: 100%;
-  background-color: ${(props) => (props.isOn ? 'red' : 'grey')};
+  background-color: ${(props) => (props.isOn ? '#E94C4C' : '#505553')};
+  border: 0px;
 `
 
 const Led: React.FC<Props> = ({ led, toggleLed }) => {

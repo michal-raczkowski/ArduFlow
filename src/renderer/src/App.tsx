@@ -120,10 +120,7 @@ function App() {
             gap="2px"
           />
         ))}
-        <Frame leds={state[currentFrame]} toggleLed={toggleLed} ledSize="50px" gap="10px" />
-        <CodeGeneratorUI state={state} width="300px" height="200px" />
-        <img style={{ width: '20%', height: '20%' }} src={logo} alt="ArduFlow Logo" />{' '}
-        <SelectableList items={jsonList} onSelect={setSelectedItem} />
+        <Frame leds={state[currentFrame]} toggleLed={toggleLed} ledSize="50px" gap="20px" />
       </div>
       <div className="card">
         <Button variant="contained" color="primary" onClick={handleClick}>
@@ -138,11 +135,7 @@ function App() {
             onPortChange={handlePortChange}
           />
         </div>
-        <p>
-          Test of <code>ArduFlow</code> library
-        </p>
       </div>
-      <p className="read-the-docs">Project to upload sketches to arduino</p>
     </>
   )
 }

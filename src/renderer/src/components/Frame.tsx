@@ -10,7 +10,11 @@ interface Props {
 }
 
 const Frame: React.FC<Props> = ({ leds, toggleLed, ledSize, gap }) => {
-  return <LedMatrix state={{ leds }} toggleLed={toggleLed} ledSize={ledSize} gap={gap} />
+  return (
+    <div style={{ border: '5px solid #50555333', padding: '51px', borderRadius: '50px' }}>
+      <LedMatrix state={{ leds }} toggleLed={toggleLed} ledSize={ledSize} gap={gap} />
+    </div>
+  )
 }
 
 export default Frame
